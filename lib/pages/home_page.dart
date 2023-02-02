@@ -1,6 +1,7 @@
 import 'package:crypo_app/models/moeda.dart';
 import 'package:crypo_app/repositories/moeda_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
@@ -10,8 +11,19 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final tabela = MoedaRepository.tabela;
+  bool showFAB = true;
+
+  late final _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(microseconds: 400),
+  )..forward();
+
+  late final _animation = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.fastOutSlowIn,
+  );
 
   List<Moeda> selecionadas = [];
 
@@ -20,13 +32,24 @@ class _HomePageState extends State<HomePage> {
     name: 'R\$',
   );
 
-  AppBar dynamicAppBar() {
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+    _animation.dispose();
+  }
+
+  StatefulWidget dynamicAppBar() {
     return selecionadas.isEmpty
-        ? AppBar(
-            title: const Text('Cripto Moedas'),
+        ? const SliverAppBar(
+            title: Text('Cripto Moedas'),
             centerTitle: true,
+            snap: true,
+            floating: true,
           )
-        : AppBar(
+        : SliverAppBar(
+            snap: true,
+            floating: true,
             leading: IconButton(
               onPressed: () {
                 setState(() {
@@ -53,60 +76,68 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: dynamicAppBar(),
-      body: ListView.separated(
-        itemBuilder: (context, index) {
-          final moeda = tabela[index];
-          return ListTile(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(20),
+      body: NestedScrollView(
+        floatHeaderSlivers: true,
+        headerSliverBuilder: (context, _) => [
+          dynamicAppBar(),
+        ],
+        body: ListView.separated(
+          itemBuilder: (context, index) {
+            final moeda = tabela[index];
+            return ListTile(
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(20),
+                ),
               ),
-            ),
-            leading: !selecionadas.contains(moeda)
-                ? SizedBox(
-                    width: 40,
-                    child: Image.asset(moeda.icone),
-                  )
-                : const CircleAvatar(
-                    child: Icon(Icons.check),
-                  ),
-            title: Text(
-              moeda.nome,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
+              leading: !selecionadas.contains(moeda)
+                  ? SizedBox(
+                      width: 40,
+                      child: Image.asset(moeda.icone),
+                    )
+                  : const CircleAvatar(
+                      child: Icon(Icons.check),
+                    ),
+              title: Text(
+                moeda.nome,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-            trailing: Text(
-              real.format(moeda.preco),
-            ),
-            selected: selecionadas.contains(moeda),
-            selectedTileColor: Colors.indigo[50],
-            onLongPress: () {
-              setState(
-                () {
-                  selecionadas.contains(moeda)
-                      ? selecionadas.remove(moeda)
-                      : selecionadas.add(moeda);
-                },
-              );
-            },
-          );
-        },
-        padding: const EdgeInsets.all(16),
-        separatorBuilder: (_, __) => const Divider(),
-        itemCount: tabela.length,
+              trailing: Text(
+                real.format(moeda.preco),
+              ),
+              selected: selecionadas.contains(moeda),
+              selectedTileColor: Colors.indigo[50],
+              onLongPress: () {
+                setState(
+                  () {
+                    selecionadas.contains(moeda)
+                        ? selecionadas.remove(moeda)
+                        : selecionadas.add(moeda);
+                  },
+                );
+              },
+            );
+          },
+          padding: const EdgeInsets.all(16),
+          separatorBuilder: (_, __) => const Divider(),
+          itemCount: tabela.length,
+        ),
       ),
       floatingActionButton: selecionadas.isNotEmpty
-          ? FloatingActionButton.extended(
-              onPressed: () {},
-              icon: const Icon(Icons.star),
-              label: const Text(
-                'FAVORITAR',
-                style: TextStyle(
-                  letterSpacing: 0,
-                  fontWeight: FontWeight.bold,
+          ? ScaleTransition(
+              scale: _animation,
+              child: FloatingActionButton.extended(
+                onPressed: () {},
+                icon: const Icon(Icons.star),
+                label: const Text(
+                  'FAVORITAR',
+                  style: TextStyle(
+                    letterSpacing: 0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             )
