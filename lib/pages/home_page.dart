@@ -20,14 +20,40 @@ class _HomePageState extends State<HomePage> {
     name: 'R\$',
   );
 
+  AppBar dynamicAppBar() {
+    return selecionadas.isEmpty
+        ? AppBar(
+            title: const Text('Cripto Moedas'),
+            centerTitle: true,
+          )
+        : AppBar(
+            leading: IconButton(
+              onPressed: () {
+                setState(() {
+                  selecionadas.clear();
+                });
+              },
+              icon: const Icon(Icons.close),
+            ),
+            title: Text(
+              '${selecionadas.length} selecionadas',
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            centerTitle: true,
+            backgroundColor: Colors.blueGrey[50],
+            elevation: 1,
+            iconTheme: const IconThemeData(color: Colors.black87),
+          );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColorLight,
-      appBar: AppBar(
-        title: const Text('Cripto Moedas'),
-        centerTitle: true,
-      ),
+      appBar: dynamicAppBar(),
       body: ListView.separated(
         itemBuilder: (context, index) {
           final moeda = tabela[index];
@@ -58,11 +84,13 @@ class _HomePageState extends State<HomePage> {
             selected: selecionadas.contains(moeda),
             selectedTileColor: Colors.indigo[50],
             onLongPress: () {
-              setState(() {
-                selecionadas.contains(moeda)
-                    ? selecionadas.remove(moeda)
-                    : selecionadas.add(moeda);
-              });
+              setState(
+                () {
+                  selecionadas.contains(moeda)
+                      ? selecionadas.remove(moeda)
+                      : selecionadas.add(moeda);
+                },
+              );
             },
           );
         },
@@ -70,6 +98,19 @@ class _HomePageState extends State<HomePage> {
         separatorBuilder: (_, __) => const Divider(),
         itemCount: tabela.length,
       ),
+      floatingActionButton: selecionadas.isNotEmpty
+          ? FloatingActionButton.extended(
+              onPressed: () {},
+              icon: const Icon(Icons.star),
+              label: const Text(
+                'FAVORITAR',
+                style: TextStyle(
+                  letterSpacing: 0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+          : null,
     );
   }
 }
