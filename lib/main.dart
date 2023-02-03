@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Crypto App',
       theme: AppTheme.theme,
       darkTheme: AppTheme.darkTheme,
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }

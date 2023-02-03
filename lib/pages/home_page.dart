@@ -1,8 +1,9 @@
 import 'package:crypo_app/models/moeda.dart';
+import 'package:crypo_app/pages/moeda_detalhes_page.dart';
 import 'package:crypo_app/repositories/moeda_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart';
+
+import '../utils/utils.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,11 +27,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   );
 
   List<Moeda> selecionadas = [];
-
-  NumberFormat real = NumberFormat.currency(
-    locale: 'pt_BR',
-    name: 'R\$',
-  );
 
   @override
   void dispose() {
@@ -73,6 +69,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           );
   }
 
+  void showDetails(Moeda moeda) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MoedaDetalhesPage(moeda: moeda),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,7 +111,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
               ),
               trailing: Text(
-                real.format(moeda.preco),
+                Utils.real.format(moeda.preco),
               ),
               selected: selecionadas.contains(moeda),
               selectedTileColor: Colors.indigo[50],
@@ -119,6 +124,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   },
                 );
               },
+              onTap: () => showDetails(moeda),
             );
           },
           padding: const EdgeInsets.all(16),

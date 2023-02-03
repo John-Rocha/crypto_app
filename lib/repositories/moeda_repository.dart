@@ -6,37 +6,37 @@ class MoedaRepository {
       icone: 'assets/images/bitcoin.png',
       nome: 'BitCoin',
       sigla: 'BTC',
-      preco: 163521.00,
+      preco: 118548.16,
     ),
     Moeda(
       icone: 'assets/images/ethereum.png',
       nome: 'Ethereum',
       sigla: 'ETH',
-      preco: 26541.00,
+      preco: 8318.53,
     ),
     Moeda(
       icone: 'assets/images/xrp.png',
       nome: 'XRP',
       sigla: 'XRP',
-      preco: 155.20,
+      preco: 2.07,
     ),
     Moeda(
       icone: 'assets/images/cardano.png',
       nome: 'Cardano',
       sigla: 'CAR',
-      preco: 2654.00,
+      preco: 2.01,
     ),
     Moeda(
       icone: 'assets/images/usdcoin.png',
       nome: 'USD Coin',
       sigla: 'USDT',
-      preco: 5.20,
+      preco: 5.05,
     ),
     Moeda(
       icone: 'assets/images/litecoin.png',
       nome: 'Litecoin',
       sigla: 'LIT',
-      preco: 541.00,
+      preco: 499.08,
     ),
   ];
 }
