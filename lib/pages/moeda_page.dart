@@ -15,18 +15,25 @@ class MoedaPage extends StatefulWidget {
 class _MoedaPageState extends State<MoedaPage> with TickerProviderStateMixin {
   final tabela = MoedaRepository.tabela;
   bool showFAB = true;
-
-  late final _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(microseconds: 400),
-  )..forward();
-
-  late final _animation = CurvedAnimation(
-    parent: _controller,
-    curve: Curves.fastOutSlowIn,
-  );
-
   List<Moeda> selecionadas = [];
+
+  late AnimationController _controller;
+
+  late CurvedAnimation _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(microseconds: 400),
+    )..forward();
+
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.fastOutSlowIn,
+    );
+  }
 
   @override
   void dispose() {
