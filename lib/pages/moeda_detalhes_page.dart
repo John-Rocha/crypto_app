@@ -1,8 +1,6 @@
+import 'package:crypo_app/models/moeda.dart';
 import 'package:crypo_app/utils/utils.dart';
 import 'package:flutter/material.dart';
-
-import 'package:crypo_app/models/moeda.dart';
-import 'package:flutter/services.dart';
 
 class MoedaDetalhesPage extends StatefulWidget {
   final Moeda moeda;
@@ -21,6 +19,12 @@ class _MoedaDetalhesPageState extends State<MoedaDetalhesPage> {
   final _valor = TextEditingController();
 
   double quantidade = 0;
+
+  @override
+  void dispose() {
+    super.dispose();
+    _valor.dispose();
+  }
 
   void comprar() {
     if (_formKey.currentState?.validate() ?? false) {
@@ -98,9 +102,6 @@ class _MoedaDetalhesPageState extends State<MoedaDetalhesPage> {
               child: TextFormField(
                 controller: _valor,
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
                 style: const TextStyle(fontSize: 22),
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
@@ -122,11 +123,13 @@ class _MoedaDetalhesPageState extends State<MoedaDetalhesPage> {
                   return null;
                 },
                 onChanged: (value) {
-                  setState(() {
-                    quantidade = (value.isEmpty)
-                        ? 0
-                        : double.parse(value) / widget.moeda.preco;
-                  });
+                  setState(
+                    () {
+                      quantidade = (value.isEmpty)
+                          ? 0
+                          : double.parse(value) / widget.moeda.preco;
+                    },
+                  );
                 },
               ),
             ),

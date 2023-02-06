@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 
 import '../utils/utils.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class MoedaPage extends StatefulWidget {
+  const MoedaPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<MoedaPage> createState() => _MoedaPageState();
 }
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+class _MoedaPageState extends State<MoedaPage> with TickerProviderStateMixin {
   final tabela = MoedaRepository.tabela;
   bool showFAB = true;
 
