@@ -1,4 +1,4 @@
-import 'package:crypo_app/pages/home_page.dart';
+import 'package:crypo_app/pages/moeda_page.dart';
 import 'package:crypo_app/ui/app_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Crypto App',
       theme: AppTheme.theme,
       darkTheme: AppTheme.darkTheme,
-      home: const HomePage(),
+      home: const MoedaPage(),
     );
   }
 }
