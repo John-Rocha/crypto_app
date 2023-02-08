@@ -1,7 +1,9 @@
 import 'package:crypo_app/models/moeda.dart';
 import 'package:crypo_app/pages/moeda_detalhes_page.dart';
+import 'package:crypo_app/repositories/favoritas_repository.dart';
 import 'package:crypo_app/repositories/moeda_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../utils/utils.dart';
 
@@ -16,6 +18,7 @@ class _MoedaPageState extends State<MoedaPage> with TickerProviderStateMixin {
   final tabela = MoedaRepository.tabela;
   bool showFAB = true;
   List<Moeda> selecionadas = [];
+  late FavoritasRepository favoritas;
 
   late AnimationController _controller;
 
@@ -85,8 +88,14 @@ class _MoedaPageState extends State<MoedaPage> with TickerProviderStateMixin {
     );
   }
 
+  void limparSelecionadas() {
+    selecionadas.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
+    favoritas = Provider.of<FavoritasRepository>(context);
+
     return Scaffold(
       body: NestedScrollView(
         floatHeaderSlivers: true,
@@ -110,12 +119,22 @@ class _MoedaPageState extends State<MoedaPage> with TickerProviderStateMixin {
                   : const CircleAvatar(
                       child: Icon(Icons.check),
                     ),
-              title: Text(
-                moeda.nome,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w500,
-                ),
+              title: Row(
+                children: [
+                  Text(
+                    moeda.nome,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  if (favoritas.lista.contains(moeda))
+                    const Icon(
+                      Icons.circle,
+                      color: Colors.amber,
+                      size: 8,
+                    ),
+                ],
               ),
               trailing: Text(
                 Utils.real.format(moeda.preco),
@@ -143,7 +162,10 @@ class _MoedaPageState extends State<MoedaPage> with TickerProviderStateMixin {
           ? ScaleTransition(
               scale: _animation,
               child: FloatingActionButton.extended(
-                onPressed: () {},
+                onPressed: () {
+                  favoritas.saveAll(selecionadas);
+                  limparSelecionadas();
+                },
                 icon: const Icon(Icons.star),
                 label: const Text(
                   'FAVORITAR',
