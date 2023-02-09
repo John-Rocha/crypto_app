@@ -4,16 +4,16 @@ import 'package:crypo_app/models/moeda.dart';
 import 'package:flutter/cupertino.dart';
 
 class FavoritasRepository extends ChangeNotifier {
-  List<Moeda> _lista = [];
+  final List<Moeda> _lista = [];
 
   UnmodifiableListView<Moeda> get lista => UnmodifiableListView(_lista);
 
   void saveAll(List<Moeda> moedas) {
-    moedas.forEach((moeda) {
+    for (var moeda in moedas) {
       if (!_lista.contains(moeda)) {
         _lista.add(moeda);
       }
-    });
+    }
     notifyListeners();
   }
 
