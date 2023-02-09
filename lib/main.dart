@@ -1,3 +1,4 @@
+import 'package:crypo_app/configs/app_settings.dart';
 import 'package:crypo_app/repositories/favoritas_repository.dart';
 import 'package:crypo_app/ui/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -5,10 +6,13 @@ import 'package:provider/provider.dart';
 
 import 'pages/home_page.dart';
 
-void main() {
+Future<void> main() async {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => FavoritasRepository(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppSettings()),
+        ChangeNotifierProvider(create: (_) => FavoritasRepository()),
+      ],
       child: const MyApp(),
     ),
   );

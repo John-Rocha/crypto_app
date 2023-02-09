@@ -1,11 +1,11 @@
+import 'package:crypo_app/configs/app_settings.dart';
 import 'package:crypo_app/models/moeda.dart';
 import 'package:crypo_app/pages/moeda_detalhes_page.dart';
 import 'package:crypo_app/repositories/favoritas_repository.dart';
 import 'package:crypo_app/repositories/moeda_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
-import '../utils/utils.dart';
 
 class MoedaPage extends StatefulWidget {
   const MoedaPage({super.key});
@@ -16,6 +16,8 @@ class MoedaPage extends StatefulWidget {
 
 class _MoedaPageState extends State<MoedaPage> with TickerProviderStateMixin {
   final tabela = MoedaRepository.tabela;
+  late NumberFormat real;
+  late Map<String, String> loc;
   bool showFAB = true;
   List<Moeda> selecionadas = [];
   late FavoritasRepository favoritas;
@@ -45,13 +47,45 @@ class _MoedaPageState extends State<MoedaPage> with TickerProviderStateMixin {
     _animation.dispose();
   }
 
+  void readNumberFormat() {
+    loc = context.watch<AppSettings>().locale;
+    real = NumberFormat.currency(
+      locale: loc['locale'],
+      name: loc['name'],
+    );
+  }
+
+  Widget changeLanguageButton() {
+    final locale = loc['locale'] == 'pt_BR' ? 'en_US' : 'pt_BR';
+    final name = loc['locale'] == 'pt_BR' ? '\$' : 'R\$';
+
+    return PopupMenuButton(
+      icon: const Icon(Icons.language),
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          child: ListTile(
+            leading: const Icon(Icons.swap_vert),
+            title: Text('Usar $locale'),
+            onTap: () {
+              context.read<AppSettings>().setLocale(locale, name);
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   StatefulWidget dynamicAppBar() {
     return selecionadas.isEmpty
-        ? const SliverAppBar(
-            title: Text('Cripto Moedas'),
+        ? SliverAppBar(
+            title: const Text('Cripto Moedas'),
             centerTitle: true,
             snap: true,
             floating: true,
+            actions: [
+              changeLanguageButton(),
+            ],
           )
         : SliverAppBar(
             snap: true,
@@ -95,6 +129,7 @@ class _MoedaPageState extends State<MoedaPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     favoritas = Provider.of<FavoritasRepository>(context);
+    readNumberFormat();
 
     return Scaffold(
       body: NestedScrollView(
@@ -137,7 +172,7 @@ class _MoedaPageState extends State<MoedaPage> with TickerProviderStateMixin {
                 ],
               ),
               trailing: Text(
-                Utils.real.format(moeda.preco),
+                real.format(moeda.preco),
               ),
               selected: selecionadas.contains(moeda),
               selectedTileColor: Colors.indigo[50],
