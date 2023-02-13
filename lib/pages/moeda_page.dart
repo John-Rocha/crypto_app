@@ -163,7 +163,7 @@ class _MoedaPageState extends State<MoedaPage> with TickerProviderStateMixin {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  if (favoritas.lista.contains(moeda))
+                  if (favoritas.lista.any((fav) => fav.sigla == moeda.sigla))
                     const Icon(
                       Icons.circle,
                       color: Colors.amber,
