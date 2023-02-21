@@ -25,7 +25,7 @@ class AppSettings extends ChangeNotifier {
 
   Future<void> _readLocale() async {
     final local = box.get('local') ?? 'pt_BR';
-    final name = box.get('name') ?? 'R\$';
+    final name = box.get('name') ?? 'R\$ ';
     locale = {
       'locale': local,
       'name': name,

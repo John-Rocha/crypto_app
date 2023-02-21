@@ -40,14 +40,14 @@ class Db {
 
   String get _carteira => '''
     CREATE TABLE carteira (
-      sigla TEXT PRIMARY KEY AUTOINCREMENT,
+      sigla TEXT PRIMARY KEY,
       moeda TEXT,
       quantidade TEXT 
     )
   ''';
 
   String get _historico => '''
-    CREATE TABLE carteira (
+    CREATE TABLE historico (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       data_operacao INT,
       tipo_operacao TEXT,
