@@ -193,7 +193,7 @@ class _CarteiraPageState extends State<CarteiraPage> {
       widgets.add(const Divider());
     }
     return Column(
-      children: widgets,
+      children: widgets.reversed.toList(),
     );
   }
 }
