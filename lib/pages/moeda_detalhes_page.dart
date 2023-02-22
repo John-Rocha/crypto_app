@@ -1,6 +1,8 @@
 import 'package:crypo_app/models/moeda.dart';
+import 'package:crypo_app/repositories/conta_repository.dart';
 import 'package:crypo_app/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MoedaDetalhesPage extends StatefulWidget {
   final Moeda moeda;
@@ -19,6 +21,7 @@ class _MoedaDetalhesPageState extends State<MoedaDetalhesPage> {
   final _valor = TextEditingController();
 
   double quantidade = 0;
+  late ContaRepository conta;
 
   @override
   void dispose() {
@@ -26,23 +29,31 @@ class _MoedaDetalhesPageState extends State<MoedaDetalhesPage> {
     _valor.dispose();
   }
 
-  void comprar() {
+  Future<void> comprar() async {
     if (_formKey.currentState?.validate() ?? false) {
       // Salvar a compra
+      await conta.comprar(widget.moeda, double.parse(_valor.text));
 
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(
-            content: Text('Compra realizada com sucesso!!'),
-          ),
-        );
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text('Compra realizada com sucesso!!'),
+            ),
+          );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    conta = Provider.of<ContaRepository>(
+      context,
+      listen: false,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.moeda.nome),
@@ -119,6 +130,8 @@ class _MoedaDetalhesPageState extends State<MoedaDetalhesPage> {
                     return 'Informe o valor da compra';
                   } else if (double.parse(value) < 50) {
                     return 'Compra mínima é de R\$ 50,00';
+                  } else if (double.parse(value) > conta.saldo) {
+                    return 'Você não tem saldo suficiente';
                   }
                   return null;
                 },
