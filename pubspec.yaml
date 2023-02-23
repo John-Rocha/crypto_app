@@ -45,6 +45,7 @@ dependencies:
   sqflite: ^2.2.4+1
   path: ^1.8.2
   fl_chart: ^0.55.2
+  firebase_core: ^2.7.0
 
 dev_dependencies:
   flutter_test:

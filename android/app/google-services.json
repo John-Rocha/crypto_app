@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "443332649473",
+    "project_id": "my-crypto-app-3778f",
+    "storage_bucket": "my-crypto-app-3778f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:443332649473:android:f912f4a722456c12ed5600",
+        "android_client_info": {
+          "package_name": "br.com.rochajohnathan.crypo_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "443332649473-1psus1thaiedpjsv76bplava97kdp6kj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2nIZ3tVivfO97UFvh3z611Xk3uO4wGfI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "443332649473-1psus1thaiedpjsv76bplava97kdp6kj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

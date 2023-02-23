@@ -2,8 +2,10 @@ import 'package:crypo_app/configs/app_settings.dart';
 import 'package:crypo_app/repositories/conta_repository.dart';
 import 'package:crypo_app/repositories/favoritas_repository.dart';
 import 'package:crypo_app/ui/app_theme.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'firebase_options.dart';
 
 import 'configs/hive_config.dart';
 import 'pages/home_page.dart';
@@ -11,6 +13,10 @@ import 'pages/home_page.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveConfig.start();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
     MultiProvider(
