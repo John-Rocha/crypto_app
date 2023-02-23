@@ -46,6 +46,7 @@ dependencies:
   path: ^1.8.2
   fl_chart: ^0.55.2
   firebase_core: ^2.7.0
+  firebase_auth: ^4.2.2
 
 dev_dependencies:
   flutter_test:
