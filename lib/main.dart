@@ -1,6 +1,7 @@
 import 'package:crypo_app/configs/app_settings.dart';
 import 'package:crypo_app/repositories/conta_repository.dart';
 import 'package:crypo_app/repositories/favoritas_repository.dart';
+import 'package:crypo_app/repositories/moeda_repository.dart';
 import 'package:crypo_app/services/auth_service.dart';
 import 'package:crypo_app/ui/app_theme.dart';
 import 'package:crypo_app/widgets/auth_check.dart';
@@ -22,12 +23,18 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthService()),
-        ChangeNotifierProvider(create: (_) => ContaRepository()),
-        ChangeNotifierProvider(create: (_) => AppSettings()),
+        ChangeNotifierProvider(create: (context) => AuthService()),
+        ChangeNotifierProvider(create: (context) => MoedaRepository()),
+        ChangeNotifierProvider(
+          create: (context) => ContaRepository(
+            moedas: context.read<MoedaRepository>(),
+          ),
+        ),
+        ChangeNotifierProvider(create: (context) => AppSettings()),
         ChangeNotifierProvider(
           create: (context) => FavoritasRepository(
             auth: context.read<AuthService>(),
+            moedas: context.read<MoedaRepository>(),
           ),
         ),
       ],
