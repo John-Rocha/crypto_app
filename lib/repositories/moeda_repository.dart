@@ -23,6 +23,29 @@ class MoedaRepository extends ChangeNotifier {
     _refreshPrecos();
   }
 
+  Future<List<Map<String, dynamic>>> getHistoricoMoeda(Moeda moeda) async {
+    List<Map<String, dynamic>> precos = [];
+    final response = await http.get(
+      Uri.parse(
+        'https://api.coinbase.com/v2/assets/prices/${moeda.baseId}?base=BRL',
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      final Map<String, dynamic> moedaPreco = json['data']['prices'];
+
+      precos.add(moedaPreco['hour']);
+      precos.add(moedaPreco['day']);
+      precos.add(moedaPreco['week']);
+      precos.add(moedaPreco['month']);
+      precos.add(moedaPreco['year']);
+      precos.add(moedaPreco['all']);
+    }
+
+    return precos;
+  }
+
   Future<void> _setupMoedaTable() async {
     const String table = '''
       CREATE TABLE IF NOT EXISTS moedas (

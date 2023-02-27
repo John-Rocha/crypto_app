@@ -1,6 +1,7 @@
 import 'package:crypo_app/models/moeda.dart';
 import 'package:crypo_app/repositories/conta_repository.dart';
 import 'package:crypo_app/utils/utils.dart';
+import 'package:crypo_app/widgets/grafico_historico.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,11 +23,22 @@ class _MoedaDetalhesPageState extends State<MoedaDetalhesPage> {
 
   double quantidade = 0;
   late ContaRepository conta;
+  Widget grafico = const SizedBox();
+  bool graficoLoaded = false;
 
   @override
   void dispose() {
     super.dispose();
     _valor.dispose();
+  }
+
+  Widget getGrafico() {
+    if (!graficoLoaded) {
+      grafico = GraficoHistorico(moeda: widget.moeda);
+      graficoLoaded = true;
+    }
+
+    return grafico;
   }
 
   Future<void> comprar() async {
