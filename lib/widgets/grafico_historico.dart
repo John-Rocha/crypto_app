@@ -24,10 +24,6 @@ class GraficoHistorico extends StatefulWidget {
 enum Periodo { hora, dia, semana, mes, ano, total }
 
 class _GraficoHistoricoState extends State<GraficoHistorico> {
-  List<Color> cores = [
-    const Color(0xFF3F51B5),
-  ];
-
   Periodo periodo = Periodo.hora;
   List<Map<String, dynamic>> historico = [];
   List dadosCompletos = [];
@@ -35,41 +31,10 @@ class _GraficoHistoricoState extends State<GraficoHistorico> {
   double maxX = 0;
   double maxY = 0;
   double minY = 0;
-
   ValueNotifier<bool> loaded = ValueNotifier(false);
-
   late MoedaRepository repository;
   late Map<String, dynamic> loc;
   late NumberFormat real;
-
-  @override
-  Widget build(BuildContext context) {
-    repository = context.read<MoedaRepository>();
-    loc = context.read<AppSettings>().locale;
-    real = NumberFormat.currency(locale: loc['locale'], name: loc['name']);
-
-    setDados();
-
-    return AspectRatio(
-      aspectRatio: 2,
-      child: Stack(
-        children: [
-          ValueListenableBuilder(
-            valueListenable: loaded,
-            builder: (context, isLoaded, _) {
-              return (isLoaded)
-                  ? LineChart(
-                      getChartData(),
-                    )
-                  : const Center(
-                      child: CircularProgressIndicator(),
-                    );
-            },
-          ),
-        ],
-      ),
-    );
-  }
 
   Future<void> setDados() async {
     loaded.value = false;
@@ -110,8 +75,121 @@ class _GraficoHistoricoState extends State<GraficoHistorico> {
       titlesData: FlTitlesData(show: false),
       borderData: FlBorderData(show: false),
       minX: 0,
+      maxX: maxX,
       minY: minY,
       maxY: maxY,
+      lineBarsData: [
+        LineChartBarData(
+          spots: dadosGrafico,
+          isCurved: true,
+          color: const Color(0xFF3F51B5),
+          barWidth: 2,
+          dotData: FlDotData(show: false),
+          belowBarData: BarAreaData(
+            show: true,
+            color: const Color(0xFF3F51B5).withOpacity(0.15),
+          ),
+        ),
+      ],
+      lineTouchData: LineTouchData(
+        touchTooltipData: LineTouchTooltipData(
+          tooltipBgColor: const Color(0xFF343434),
+          getTooltipItems: (data) {
+            return data.map(
+              (item) {
+                final date = getDate(item.spotIndex);
+                return LineTooltipItem(
+                  real.format(item.y),
+                  const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: '\n $date',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white.withOpacity(.5),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ).toList();
+          },
+        ),
+      ),
+    );
+  }
+
+  String getDate(int index) {
+    DateTime date = dadosCompletos[index][1];
+    if (periodo != Periodo.ano && periodo != Periodo.total) {
+      return DateFormat('dd/MM - hh:mm').format(date);
+    } else {
+      return DateFormat('dd/MM/y').format(date);
+    }
+  }
+
+  Widget chartButton(Periodo p, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: OutlinedButton(
+        onPressed: () => setState(() => periodo = p),
+        style: (periodo != p)
+            ? ButtonStyle(
+                foregroundColor: MaterialStateProperty.all(Colors.grey),
+              )
+            : ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.indigo[50]),
+              ),
+        child: Text(label),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    repository = context.read<MoedaRepository>();
+    loc = context.read<AppSettings>().locale;
+    real = NumberFormat.currency(locale: loc['locale'], name: loc['name']);
+    setDados();
+
+    return AspectRatio(
+      aspectRatio: 2,
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                chartButton(Periodo.hora, '1H'),
+                chartButton(Periodo.dia, '24H'),
+                chartButton(Periodo.semana, '7D'),
+                chartButton(Periodo.mes, 'Mês'),
+                chartButton(Periodo.ano, 'Ano'),
+                chartButton(Periodo.total, 'Tudo'),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 80),
+            child: ValueListenableBuilder(
+              valueListenable: loaded,
+              builder: (context, isLoaded, _) {
+                return (isLoaded)
+                    ? LineChart(
+                        getChartData(),
+                      )
+                    : const Center(
+                        child: CircularProgressIndicator(),
+                      );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
