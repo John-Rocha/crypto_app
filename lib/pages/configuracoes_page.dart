@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:crypo_app/configs/app_settings.dart';
+import 'package:crypo_app/pages/documentos_page.dart';
 import 'package:crypo_app/repositories/conta_repository.dart';
 import 'package:crypo_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,6 @@ class ConfiguracoesPage extends StatefulWidget {
 }
 
 class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
-  bool loading = false;
   _updateSaldo() async {
     final formKey = GlobalKey<FormState>();
     final valor = TextEditingController();
@@ -65,22 +65,6 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
     );
   }
 
-  Future<void> logout() async {
-    setState(() => loading = true);
-    try {
-      await context.read<AuthService>().logout();
-    } on AuthException catch (e) {
-      setState(() => loading = false);
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar
-        ..showSnackBar(
-          SnackBar(
-            content: Text(e.message),
-          ),
-        );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final conta = context.watch<ContaRepository>();
@@ -115,39 +99,43 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
               ),
             ),
             const Divider(),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red,
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Escanear a CNH ou RG'),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DocumentosPage(),
+                  fullscreenDialog: true,
                 ),
-                onPressed: logout,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: loading
-                      ? [
-                          const Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
+              ),
+            ),
+            const Divider(),
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                    ),
+                    onPressed: () => context.read<AuthService>().logout(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text(
+                            'Sair do App',
+                            style: TextStyle(
+                              fontSize: 18,
                             ),
-                          )
-                        ]
-                      : [
-                          const Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Text(
-                              'Sair do App',
-                              style: TextStyle(
-                                fontSize: 18,
-                              ),
-                            ),
-                          )
-                        ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ),
               ),
             )
