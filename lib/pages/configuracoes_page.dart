@@ -1,84 +1,36 @@
-// ignore_for_file: library_private_types_in_public_api
+import 'dart:io';
 
-import 'package:crypo_app/configs/app_settings.dart';
-import 'package:crypo_app/pages/documentos_page.dart';
-import 'package:crypo_app/repositories/conta_repository.dart';
-import 'package:crypo_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+import '../configs/app_settings.dart';
+import '../repositories/conta_repository.dart';
+import '../services/auth_service.dart';
+import 'documentos_page.dart';
 
 class ConfiguracoesPage extends StatefulWidget {
   const ConfiguracoesPage({Key? key}) : super(key: key);
 
   @override
-  _ConfiguracoesPageState createState() => _ConfiguracoesPageState();
+  State<ConfiguracoesPage> createState() => _ConfiguracoesPageState();
 }
 
 class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
-  _updateSaldo() async {
-    final formKey = GlobalKey<FormState>();
-    final valor = TextEditingController();
-    final conta = context.read<ContaRepository>();
-
-    valor.text = conta.saldo.toString();
-
-    AlertDialog dialog = AlertDialog(
-      title: const Text('Atualizar o Saldo'),
-      content: Form(
-        key: formKey,
-        child: TextFormField(
-          controller: valor,
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
-          ],
-          validator: (value) {
-            if (value!.isEmpty) return 'Informe o valor do saldo';
-            return null;
-          },
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('CANCELAR'),
-        ),
-        TextButton(
-          onPressed: () {
-            if (formKey.currentState?.validate() ?? false) {
-              conta.setSaldo(double.parse(valor.text));
-              Navigator.of(context).pop();
-            }
-          },
-          child: const Text('SALVAR'),
-        ),
-      ],
-    );
-
-    showDialog(
-      context: context,
-      builder: (context) => dialog,
-    );
-  }
+  XFile? comprovante;
 
   @override
   Widget build(BuildContext context) {
     final conta = context.watch<ContaRepository>();
     final loc = context.read<AppSettings>().locale;
-
-    NumberFormat real = NumberFormat.currency(
-      locale: loc['locale'],
-      name: loc['name'],
-    );
+    NumberFormat real =
+        NumberFormat.currency(locale: loc['locale'], name: loc['name']);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Configurações'),
-        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(12),
@@ -88,15 +40,13 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
               title: const Text('Saldo'),
               subtitle: Text(
                 real.format(conta.saldo),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 25,
-                  color: Theme.of(context).primaryColor,
+                  color: Colors.indigo,
                 ),
               ),
               trailing: IconButton(
-                onPressed: _updateSaldo,
-                icon: const Icon(Icons.edit),
-              ),
+                  onPressed: updateSaldo, icon: const Icon(Icons.edit)),
             ),
             const Divider(),
             ListTile(
@@ -111,16 +61,25 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
               ),
             ),
             const Divider(),
+            ListTile(
+              leading: const Icon(Icons.attach_file),
+              title: const Text('Enviar Comprovante de Depósito'),
+              onTap: selecionarComprovante,
+              trailing: comprovante != null
+                  ? Image.file(File(comprovante!.path))
+                  : null,
+            ),
+            const Divider(),
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24),
                   child: OutlinedButton(
+                    onPressed: () => context.read<AuthService>().logout(),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
                     ),
-                    onPressed: () => context.read<AuthService>().logout(),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
@@ -128,20 +87,71 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
                           padding: EdgeInsets.all(16.0),
                           child: Text(
                             'Sair do App',
-                            style: TextStyle(
-                              fontSize: 18,
-                            ),
+                            style: TextStyle(fontSize: 18),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
+  }
+
+  selecionarComprovante() async {
+    final ImagePicker picker = ImagePicker();
+
+    try {
+      XFile? file = await picker.pickImage(source: ImageSource.gallery);
+      if (file != null) setState(() => comprovante = file);
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  updateSaldo() async {
+    final form = GlobalKey<FormState>();
+    final valor = TextEditingController();
+    final conta = context.read<ContaRepository>();
+
+    valor.text = conta.saldo.toString();
+
+    AlertDialog dialog = AlertDialog(
+      title: const Text('Atualizar o Saldo'),
+      content: Form(
+        key: form,
+        child: TextFormField(
+          controller: valor,
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+          ],
+          validator: (value) {
+            if (value!.isEmpty) return 'Informe o valor do saldo';
+            return null;
+          },
+        ),
+      ),
+      actions: [
+        TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('CANCELAR')),
+        TextButton(
+          onPressed: () {
+            if (form.currentState!.validate()) {
+              conta.setSaldo(double.parse(valor.text));
+              Navigator.pop(context);
+            }
+          },
+          child: const Text('SALVAR'),
+        ),
+      ],
+    );
+
+    showDialog(context: context, builder: (context) => dialog);
   }
 }
