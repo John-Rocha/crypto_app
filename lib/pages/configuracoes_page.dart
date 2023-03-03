@@ -31,6 +31,7 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Configurações'),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(12),
@@ -46,7 +47,9 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
                 ),
               ),
               trailing: IconButton(
-                  onPressed: updateSaldo, icon: const Icon(Icons.edit)),
+                onPressed: updateSaldo,
+                icon: const Icon(Icons.edit),
+              ),
             ),
             const Divider(),
             ListTile(
@@ -138,8 +141,9 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
       ),
       actions: [
         TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('CANCELAR')),
+          onPressed: () => Navigator.pop(context),
+          child: const Text('CANCELAR'),
+        ),
         TextButton(
           onPressed: () {
             if (form.currentState!.validate()) {
@@ -152,6 +156,9 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
       ],
     );
 
-    showDialog(context: context, builder: (context) => dialog);
+    showDialog(
+      context: context,
+      builder: (context) => dialog,
+    );
   }
 }
