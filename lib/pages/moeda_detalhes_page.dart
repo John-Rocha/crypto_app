@@ -4,6 +4,7 @@ import 'package:crypo_app/utils/utils.dart';
 import 'package:crypo_app/widgets/grafico_historico.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:social_share/social_share.dart';
 
 class MoedaDetalhesPage extends StatefulWidget {
   final Moeda moeda;
@@ -59,6 +60,16 @@ class _MoedaDetalhesPageState extends State<MoedaDetalhesPage> {
     }
   }
 
+  Future<bool?> compartilharPreco() async {
+    final moeda = widget.moeda;
+    return SocialShare.shareOptions(
+      'Confira o preço do ${moeda.nome} agora: ${Utils.real.format(moeda.preco)}',
+    ).then((value) {
+      debugPrint(value.toString());
+      return null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     conta = Provider.of<ContaRepository>(
@@ -70,6 +81,12 @@ class _MoedaDetalhesPageState extends State<MoedaDetalhesPage> {
       appBar: AppBar(
         title: Text(widget.moeda.nome),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: compartilharPreco,
+            icon: const Icon(Icons.share),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
